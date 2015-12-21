@@ -4,5 +4,7 @@
 
 (defpackage #:gchq-puzzle
   (:use #:cl)
-  (:export #:solve-puzzle))
+  (:export #:solve-puzzle
+           #:to-png
+           #:calculate-full-row-states))
 

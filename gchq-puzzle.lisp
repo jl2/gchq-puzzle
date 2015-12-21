@@ -59,11 +59,11 @@
   "Figure out whether the cell at i,j is on or off."
   (let ((cur-row (aref rows j)))
     (loop 
+       for cur-count = i then (- cur-count cell-count)
        for cell-count across cur-row
        for idx from 0
-       for cur-count = i then (- cur-count cell-count)
        until (< cur-count 0)
-       finally (return (/= 0 (mod idx 2))))))
+       finally (return (= 0 (mod idx 2))))))
 
 (defun to-png (file-name rows &optional (square-size 20))
   "Write puzzle state to a .png file."
@@ -75,8 +75,9 @@
       (cl-cairo2:set-source-rgba 0.0 0.0 0.0 1.0)
       (dotimes (a psize)
         (dotimes (b psize)
-          (when (state-at rows a b) (cl-cairo2:rectangle (* a square-size) (* b square-size) square-size square-size))))
-      (cl-cairo2:fill-path))))
+          (when (state-at rows a b)
+            (cl-cairo2:rectangle (* a square-size) (* b square-size) square-size square-size)
+            (cl-cairo2:fill-path)))))))
 
 (defun calculate-full-row-states (numbers)
   "numbers is a list of lists where each inner list element is the length of contiguos black cells.
@@ -215,8 +216,9 @@
 
 (defun solve-puzzle (&key file-name (columns *columns*) (rows *rows*))
   (let (;; (board (make-array (list (length columns) (length rows)) :element-type t :initial-element nil))
-        (new-rows (add-white-blocks rows)))
+        (new-rows (calculate-full-row-states rows)))
     (inner-solve new-rows 0 0 columns)
-    (to-png file-name new-rows)))
+    (to-png file-name new-rows)
+    new-rows))
     ;; (fill-board board new-rows)
     ;; (to-png file-name board)))
